@@ -106,6 +106,10 @@ function createBlocks() {
             let y = r * 30 + 30;
             let hits = hitsPerLevel;
 
+            if (level === 3 && r === 0 && c === 0) {
+                hits = -1; // irrompible
+            }
+
             blocks.push(new Block(x, y, hits));
         }
     }
