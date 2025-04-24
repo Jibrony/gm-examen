@@ -1,4 +1,4 @@
-let paddle, ball, blocks = [], level = 1;
+let paddle, blocks = [], level = 1;
 let cols = 8;
 let rows = 4;
 let score = 0;
@@ -9,7 +9,10 @@ let hitSound;
 let transitioning = false;
 let transitionTimer = 0;
 let transitionDuration = 60;
-let paused = false; 
+let paused = false;
+
+let powerUps = [];
+let balls = [];
 
 function preload() {
   hitSound = loadSound('hit.wav');
@@ -18,10 +21,9 @@ function preload() {
 function setup() {
   createCanvas(600, 400);
   paddle = new Paddle();
-  ball = new Ball();
+  balls = [new Ball()];
   createBlocks();
 }
-
 
 function draw() {
   if (paused) {
@@ -39,12 +41,11 @@ function draw() {
     textSize(28);
     textAlign(CENTER, CENTER);
     text(`Nivel ${level}`, width / 2, height / 2);
-
     transitionTimer--;
     if (transitionTimer <= 0) {
       transitioning = false;
-      ball.speedUp();
-      ball.reset();
+      balls.forEach(b => b.speedUp());
+      balls = [new Ball()];
     }
     return;
   }
@@ -52,34 +53,46 @@ function draw() {
   paddle.display();
   paddle.move();
 
-  if (gameStarted) ball.move();
-  ball.display();
-  ball.checkEdges(paddle);
+  if (gameStarted) {
+    for (let b of balls) b.move();
+  }
+
+  for (let b of balls) {
+    b.display();
+    b.checkEdges(paddle);
+  }
 
   for (let i = blocks.length - 1; i >= 0; i--) {
     let block = blocks[i];
     block.display();
 
-    if (!block.removing && ball.hits(block)) {
-      let overlapLeft = ball.x + ball.r - block.x;
-      let overlapRight = block.x + block.w - (ball.x - ball.r);
-      let overlapTop = ball.y + ball.r - block.y;
-      let overlapBottom = block.y + block.h - (ball.y - ball.r);
-      let minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+    for (let b of balls) {
+      if (!block.removing && b.hits(block)) {
+        let overlapLeft = b.x + b.r - block.x;
+        let overlapRight = block.x + block.w - (b.x - b.r);
+        let overlapTop = b.y + b.r - block.y;
+        let overlapBottom = block.y + block.h - (b.y - b.r);
+        let minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
 
-      if (minOverlap === overlapTop || minOverlap === overlapBottom) {
-        ball.yspeed *= -1;
-      } else {
-        ball.xspeed *= -1;
-      }
+        if (minOverlap === overlapTop || minOverlap === overlapBottom) {
+          b.yspeed *= -1;
+        } else {
+          b.xspeed *= -1;
+        }
 
-      if (hitSound && hitSound.isLoaded()) {
-        hitSound.setVolume(random(0.5, 0.8));
-        hitSound.play();
-      }
+        if (hitSound && hitSound.isLoaded()) {
+          hitSound.setVolume(random(0.5, 0.8));
+          hitSound.play();
+        }
 
-      if (block.hit()) {
-        block.removing = true;
+        if (block.hit()) {
+          block.removing = true;
+
+          if (random() < 0.15) {
+            let type = random() < 0.5 ? 'life' : 'multi';
+            powerUps.push(new PowerUp(block.x + block.w / 2, block.y + block.h / 2, type));
+          }
+        }
       }
     }
 
@@ -93,11 +106,43 @@ function draw() {
     }
   }
 
+  for (let i = powerUps.length - 1; i >= 0; i--) {
+    let p = powerUps[i];
+    p.update();
+    p.display();
+
+    if (p.hitsPaddle(paddle)) {
+      if (p.type === 'life') {
+        lives++;
+      } else if (p.type === 'multi') {
+        let newBalls = [];
+        for (let b of balls) {
+          let newBall = new Ball();
+          newBall.x = b.x;
+          newBall.y = b.y;
+          newBall.xspeed = -b.xspeed;
+          newBall.yspeed = b.yspeed;
+          newBalls.push(newBall);
+        }
+        balls.push(...newBalls);
+      }
+      powerUps.splice(i, 1);
+    } else if (p.offScreen()) {
+      powerUps.splice(i, 1);
+    }
+  }
+
   displayUI();
 
   if (blocks.length === 0 && !transitioning) nextLevel();
 
-  if (ball.offScreen()) {
+  for (let i = balls.length - 1; i >= 0; i--) {
+    if (balls[i].offScreen()) {
+      balls.splice(i, 1);
+    }
+  }
+
+  if (balls.length === 0) {
     lives--;
     gameStarted = false;
     if (lives < 0) {
@@ -110,7 +155,7 @@ function draw() {
       text("Presiona R para reiniciar", width / 2, height / 2 + 40);
       noLoop();
     } else {
-      ball.reset();
+      balls = [new Ball()];
     }
   }
 }
@@ -139,16 +184,16 @@ function restartGame() {
     transitioning = false;
     transitionTimer = 0;
     createBlocks();
-    ball.reset();
+    balls = [new Ball()];
     loop();
   }
 }
 
 function displayUI() {
-  select('#score').html(`Puntuación: ${score}`);
-  select('#lives').html(`Vidas: ${lives}`);
-  select('#level').html(`Nivel: ${level}`);
-  
+  select('#Puntos').html(`Puntuación: ${score}`);
+  select('#Vidas').html(`Vidas: ${lives}`);
+  select('#Nivel').html(`Nivel: ${level}`);
+
   if (!gameStarted && !transitioning && !paused) {
     fill(255);
     textSize(16);
@@ -156,7 +201,6 @@ function displayUI() {
     text("Presiona ESPACIO para lanzar la pelota", width / 2, height / 2);
   }
 }
-
 
 function createBlocks() {
   blocks = [];
@@ -169,9 +213,7 @@ function createBlocks() {
       let y = r * 30 + 30;
       let hits = hitsPerLevel;
 
-      if (level === 3 && r === 0 && c === 0) {
-        hits = -1; // Irrompible
-      }
+      if (level === 3 && r === 0 && c === 0) hits = -1;
 
       blocks.push(new Block(x, y, hits));
     }
@@ -309,5 +351,40 @@ class Block {
     if (this.hits === -1) return false;
     this.hits--;
     return this.hits <= 0;
+  }
+}
+
+class PowerUp {
+  constructor(x, y, type) {
+    this.x = x;
+    this.y = y;
+    this.r = 12;
+    this.type = type;
+    this.speed = 2;
+  }
+
+  display() {
+    fill(this.type === 'life' ? 'pink' : 'cyan');
+    ellipse(this.x, this.y, this.r * 2);
+    fill(0);
+    textSize(14);
+    textAlign(CENTER, CENTER);
+    text(this.type === 'life' ? '❤' : '×2', this.x, this.y + 1);
+  }
+
+  update() {
+    this.y += this.speed;
+  }
+
+  hitsPaddle(paddle) {
+    return (
+      this.y + this.r > paddle.y &&
+      this.x > paddle.x &&
+      this.x < paddle.x + paddle.w
+    );
+  }
+
+  offScreen() {
+    return this.y > height;
   }
 }
