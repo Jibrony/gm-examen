@@ -39,7 +39,7 @@ function draw() {
     return;
   }
 
-  background(30, 30, 40);
+  background(0, 0, 0);
 
   if (transitioning) {
     fill(255);
