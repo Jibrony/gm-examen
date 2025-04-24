@@ -22,6 +22,7 @@ function setup() {
   createBlocks();
 }
 
+
 function draw() {
   if (paused) {
     fill(255);
@@ -144,15 +145,18 @@ function restartGame() {
 }
 
 function displayUI() {
-  fill(255);
-  textSize(16);
-  text(`Puntuación: ${score}`, 10, 20);
-  text(`Vidas: ${lives}`, 10, 40);
-  text(`Nivel: ${level}`, 10, 60);
+  select('#score').html(`Puntuación: ${score}`);
+  select('#lives').html(`Vidas: ${lives}`);
+  select('#level').html(`Nivel: ${level}`);
+  
   if (!gameStarted && !transitioning && !paused) {
-    text("Presiona ESPACIO para lanzar la pelota", width / 2 - 130, height / 2);
+    fill(255);
+    textSize(16);
+    textAlign(CENTER);
+    text("Presiona ESPACIO para lanzar la pelota", width / 2, height / 2);
   }
 }
+
 
 function createBlocks() {
   blocks = [];

@@ -1,13 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            background-color: #1e1e2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #scoreboard {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            font-size: 18px;
+            color: white;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        #scoreboard span {
+            margin: 0 20px;
+        }
+    </style>
     <title>Andrey Arce</title>
 </head>
+
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+    <div id="scoreboard">
+        <span id="score">Puntuación: 0</span>
+        <span id="lives">Vidas: 3</span>
+        <span id="level">Nivel: 1</span>
+      </div>
+      
+    <div class="game-container"></div>
     <script src="breakout.js"></script>
 </body>
+
 </html>
