@@ -3,7 +3,7 @@
 *Departamento Académico de Sistemas Computacionales*  
 *Ingeniería en Desarrollo de Software - 8vo Semestre*  
 **Materia:** Graficación y Multimedia  
-**Docente:** Jesús Zuñiga  
+**Docente:** Jesús Antonio Zuñiga Arce 
 
 ---
 
