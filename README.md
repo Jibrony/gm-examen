@@ -20,7 +20,7 @@ Implementación del clásico *Breakout* usando **p5.js**, con tres niveles de di
 - **Controles:** Barra móvil (← → teclado).  
 - **Niveles:**  
   - **Nivel 1:** Bloques básicos (dificultad baja).  
-  - **Nivel 2:** +Bloques, 1 bloque resistente (3 golpes) y ↑velocidad pelota.  
+  - **Nivel 2:** +Bloques, 1 bloque resistente (2 golpes) y aumenta ligeramente la velocidad de la pelota.  
   - **Nivel 3:** +Bloques, 2 bloques resistentes (3 golpes) + 1 bloque indestructible.  
 - **Sistema de vidas:** Pérdida al dejar caer la pelota.  
 - **Puntuación:** +1 punto por bloque roto (acumulativo en todos los niveles).  
