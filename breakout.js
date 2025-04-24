@@ -25,8 +25,9 @@ function setup() {
   paddle = new Paddle();
   balls = [new Ball()];
   createBlocks();
-  bgMusic.loop();
-  bgMusic.setVolume(0.2);
+  bgMusic.setLoop(true);
+  bgMusic.setVolume(0.3);
+  bgMusic.play();
 }
 
 function draw() {
@@ -179,6 +180,12 @@ function keyReleased() {
 
 function togglePause() {
   paused = !paused;
+
+  if (paused) {
+    bgMusic.pause();
+  } else {
+    bgMusic.play();
+  }
 }
 
 function restartGame() {
