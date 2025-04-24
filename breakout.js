@@ -15,7 +15,9 @@ let powerUps = [];
 let balls = [];
 
 function preload() {
-  hitSound = loadSound('hit.wav');
+  hitSound = loadSound('./sounds/hit.wav');
+  powerUpSound = loadSound('./sounds/powerup.mp3');
+  bgMusic = loadSound('./sounds/background_music.mp3'); 
 }
 
 function setup() {
@@ -23,6 +25,8 @@ function setup() {
   paddle = new Paddle();
   balls = [new Ball()];
   createBlocks();
+  bgMusic.loop();
+  bgMusic.setVolume(0.2);
 }
 
 function draw() {
@@ -126,6 +130,7 @@ function draw() {
         }
         balls.push(...newBalls);
       }
+      powerUpSound.play();
       powerUps.splice(i, 1);
     } else if (p.offScreen()) {
       powerUps.splice(i, 1);
